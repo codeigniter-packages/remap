@@ -1,0 +1,26 @@
+{
+	"name": "codeigniter-packages/remap",
+	"description": "",
+	"license": "MIT",
+	"keywords": [
+		"codeigniter", "packages"
+	],
+	"authors": [
+		{
+			"name": "jooonwood",
+			"email": "jooonwood@gmail.com"
+		}
+	],
+	"homepage": "https://github.com/codeigniter-packages/remap",
+	"support": {
+		"issues": "https://github.com/codeigniter-packages/remap/issues",
+		"source": "https://github.com/codeigniter-packages/remap"
+	},
+	"require": {
+        "php": ">=5.4.0",
+        "codeigniter-packages/loader": "dev-master"
+    },
+	"autoload": {
+        "files": ["codeigniter_packages_remap.php"]
+    }
+}
