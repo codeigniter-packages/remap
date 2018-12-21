@@ -50,8 +50,9 @@ trait codeigniter_packages_remap {
                     $data[$key][]=$theme_name.'/'.$component_name;
                 }
             }
-            
-            $this->load->package($theme['index'],$data);
+
+
+            stristr($theme['index'],':') === FALSE?$this->load->view($theme['index'],$data):$this->load->package($theme['index'],$data);
 
         }
     }
