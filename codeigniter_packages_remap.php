@@ -20,8 +20,6 @@ trait codeigniter_packages_remap {
 
             //加载视图配置
             $theme=$this->config->item($theme_name, 'themes');
-            //获取控制器中调用的方法
-            $method=$this->router->fetch_class().'/'.$method;
 
             //设置主题的全局设置
             foreach ($theme['global'] as $key) {
@@ -30,27 +28,36 @@ trait codeigniter_packages_remap {
                 }
             }
 
-            if(!isset($theme[$method])){
-                $theme[$method]=array();
-            }
-            //从视图配置中通过控制器调用的方法得到该页面对应的视图配置
-            //将视图配置文件使用到的组件添加上完整的路径
-            foreach ($theme[$method] as $key => $components) {
-                //设置每个页面的全局变量
-                if(in_array($key,$theme['global'])){
-                    $data[$key]=(isset($theme[$key]) && is_array($theme[$key]))?
-                    array_merge($theme[$key],$theme[$method][$key]):$theme[$method][$key];
-                    continue;
-                }
+            //设置控制器参数
+            $controller_name = $this->router->fetch_class();
+            $controller_configs_default=array(
+                'routers'=>array(
+                    $method=>array(
+                        'components'=>array()
+                    )
+                )
+            );
+            $controller_configs = isset($theme['routers'][$controller_name])?$theme['routers'][$controller_name]:$controller_configs_default;
+            //取出控制器中方法的参数
+            $method_configs = $controller_configs['routers'][$method];
+            //删除控制器下的方法配置参数，当前method的配置已经在$method_configs
+            unset($theme['routers'][$controller_name]['routers']);
 
-                if(!is_array($components)){
-                    continue;
-                }
-                foreach ($components as $component_name) {
-                    $data[$key][]=$theme_name.'/'.$component_name;
-                }
+            foreach ($controller_configs as $key=>$value) {
+                $data[$key]=(isset($data[$key]) && is_array($data[$key]))?array_merge($data[$key],$value):$value;
             }
 
+            foreach ($method_configs as $key=>$value) {
+                $data[$key]=(isset($data[$key]) && is_array($data[$key]))?array_merge($data[$key],$value):$value;
+            }
+
+            if(isset($data['components'])){
+                foreach ($data['components'] as $key => $value) {
+                    foreach ($value as $i => $component_path) {
+                       $data['components'][$key][$i]=$theme_name.'/'.$component_path;
+                    }
+                }
+            }
 
             stristr($theme['index'],':') === FALSE?$this->load->view($theme['index'],$data):$this->load->package($theme['index'],$data);
 
